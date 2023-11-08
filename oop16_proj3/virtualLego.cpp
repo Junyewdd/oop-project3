@@ -257,7 +257,9 @@ public:
 	//구와 벽 사이에 충돌 확인
 	bool hasIntersected(CSphere& ball) 
 	{
-		if(ball)
+		if ((ball.getRadius() + ball.getCenter().x) == (this->m_x + (this->m_width) / 2) || (ball.getRadius() - ball.getCenter().x) == (this->m_x - (this->m_width) / 2) || (ball.getRadius() + ball.getCenter().z) == (this->m_z + (this->m_height) / 2) || (ball.getRadius() - ball.getCenter().z) == (this->m_z - (this->m_height) / 2)) {
+			return true;
+		}
 		return false;
 	}
 	//충돌 시 작업
