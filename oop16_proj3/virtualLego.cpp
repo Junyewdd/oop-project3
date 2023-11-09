@@ -133,14 +133,14 @@ public:
 
 			//correction of position of ball
 			// Please uncomment this part because this correction of ball position is necessary when a ball collides with a wall
-			/*if(tX >= (4.5 - M_RADIUS))
+			if(tX >= (4.5 - M_RADIUS))
 				tX = 4.5 - M_RADIUS;
 			else if(tX <=(-4.5 + M_RADIUS))
 				tX = -4.5 + M_RADIUS;
 			else if(tZ <= (-3 + M_RADIUS))
 				tZ = -3 + M_RADIUS;
 			else if(tZ >= (3 - M_RADIUS))
-				tZ = 3 - M_RADIUS;*/
+				tZ = 3 - M_RADIUS;
 			
 			this->setCenter(tX, cord.y, tZ);
 		}
@@ -257,7 +257,9 @@ public:
 	//구와 벽 사이에 충돌 확인
 	bool hasIntersected(CSphere& ball) 
 	{
-		if ((ball.getRadius() + ball.getCenter().x) == (this->m_x + (this->m_width) / 2) || (ball.getRadius() - ball.getCenter().x) == (this->m_x - (this->m_width) / 2) || (ball.getRadius() + ball.getCenter().z) == (this->m_z + (this->m_height) / 2) || (ball.getRadius() - ball.getCenter().z) == (this->m_z - (this->m_height) / 2)) {
+		D3DXVECTOR3	ballPos = ball.getCenter();
+		
+		if ((ball.getRadius() + ballPos.x) == (this->m_width / 2) || (ballPos.x - ball.getRadius()) == (-(this->m_width / 2)) || (ball.getRadius() + ballPos.z) == (this->m_depth / 2) || (ballPos.z - ball.getRadius()) == (-(this->m_depth / 2))) {
 			return true;
 		}
 		return false;
@@ -266,6 +268,14 @@ public:
 	void hitBy(CSphere& ball) 
 	{
 		// Insert your code here.
+		if (hasIntersected(ball)) {
+			if ((ball.getCenter().x - ball.getRadius()) == (-(this->m_width / 2)) || (ball.getCenter().x + ball.getRadius()) == (this->m_width / 2)) {
+				ball.setPower(-ball.getVelocity_X(), ball.getVelocity_Z());
+			}
+			else if ((ball.getCenter().z + ball.getRadius()) == (this->m_depth / 2) || (ball.getCenter().z - ball.getRadius()) == (-(this->m_depth / 2))) {
+				ball.setPower(ball.getVelocity_X(), -ball.getVelocity_Z());
+			}
+		}
 	}    
 	
 	void setPosition(float x, float y, float z)
