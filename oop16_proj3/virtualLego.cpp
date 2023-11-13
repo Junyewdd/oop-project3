@@ -112,65 +112,34 @@ public:
 		}
 		return false;
 	}
-	
+
 	//충돌 시 수행
 	void hitBy(CSphere& ball) 
 	{ 
-		if (hasIntersected(ball)) {
-			D3DXVECTOR3 targetpos = ball.getCenter();
-			D3DXVECTOR3	whitepos = this->getCenter();
-			double power = sqrt(pow(ball.getVelocity_X(), 2) + pow(ball.getVelocity_Z(), 2)) / 2;
-			double targetTheta = acos(sqrt(pow(targetpos.x - whitepos.x, 2)) / sqrt(pow(targetpos.x - whitepos.x, 2) + pow(targetpos.z - whitepos.z, 2))); // 1 사분면으로 갈 때
-			double distance = sqrt(pow(targetpos.x - whitepos.x, 2) + pow(targetpos.z - whitepos.z, 2));
-			double whiteTheta;
-			if (targetpos.x >= whitepos.x && targetpos.z >= whitepos.z) {
-				if (targetTheta < PI / 4) { //아래쪽
-					whiteTheta = targetTheta + PI / 2;
-					//exit(0);
-				}
-				else { //위쪽
-					whiteTheta = targetTheta - PI / 2;
-					//exit(0);
-				}
-			}
-			//3 사분면으로 갈 때
-			if (targetpos.x <= whitepos.x && targetpos.z <= whitepos.z) {
-				targetTheta = PI + targetTheta;
-				if (targetTheta < 5 * PI / 4) { //위쪽
-					whiteTheta = targetTheta + PI / 2;
-					//exit(0);
-				}
-				else { //아래쪽
-					whiteTheta = targetTheta - PI / 2;
-					
-				}
-			}
-			//2 사분면으로 갈 때
-			else if (targetpos.x <= whitepos.x && targetpos.z >= whitepos.z) {
-				targetTheta = PI - targetTheta;
-				if (targetTheta > 3 * PI / 4) { // 아래쪽
-					whiteTheta = targetTheta - PI/2;
-					//exit(0);
-				}
-				else {
-					whiteTheta = targetTheta + PI/2;
-					//exit(0);
-				}
-			}
-			//4 사분면으로 갈 때
-			else if (targetpos.x >= whitepos.x && targetpos.z <= whitepos.z) {
-				targetTheta = -targetTheta;
-				if (targetTheta > -PI / 4) { //위쪽
-					whiteTheta = targetTheta - PI / 2;
-					//exit(0);
-				}
-				else {
-					whiteTheta = targetTheta + PI / 2;
-					//exit(0);
-				}
-			}
-			this->setPower(-power * cos(targetTheta), -power * sin(targetTheta));
-			ball.setPower(-power * cos(whiteTheta), -power * sin(whiteTheta));
+		if (this->hasIntersected(ball)) {
+			D3DXVECTOR3 ball_cord = ball.getCenter();
+
+			double d_x = center_x - ball_cord.x;
+			double d_z = center_z - ball_cord.z;
+			double size_d = sqrt((d_x * d_x) + (d_z * d_z));
+
+			double vax = this->m_velocity_x;
+			double vaz = this->m_velocity_z;
+			double vbx = ball.m_velocity_x;
+			double vbz = ball.m_velocity_z;
+
+			double size_this_v = sqrt((vax * vax) + (vaz * vaz));
+
+			double cos_t = d_x / size_d;
+			double sin_t = d_z / size_d;
+
+			double vaxp = vbx * cos_t + vbz * sin_t;
+			double vbxp = vax * cos_t + vaz * sin_t;
+			double vazp = vaz * cos_t - vax * sin_t;
+			double vbzp = vbz * cos_t - vbx * sin_t;
+
+			this->setPower(vaxp * cos_t - vazp * sin_t, vaxp * sin_t + vazp * cos_t);
+			ball.setPower(vbxp * cos_t - vbzp * sin_t, vbxp * sin_t + vbzp * cos_t);
 		}
 		// Insert your code here.
 	}
