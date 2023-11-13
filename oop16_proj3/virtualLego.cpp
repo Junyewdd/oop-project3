@@ -107,7 +107,7 @@ public:
     bool hasIntersected(CSphere& ball) 
 	{
 		//(중심 점 사이의 거리)^2 == (공들의 반지름 합)^2
-		if ((pow((this->center_x - ball.center_x), 2) + pow((this->center_y) - (ball.center_y), 2) + pow((this->center_z) - (ball.center_z), 2)) == (this->getRadius() + ball.getRadius())) {
+		if ((pow((this->center_x - ball.center_x), 2) + pow((this->center_z) - (ball.center_z), 2)) <= pow(this->getRadius() + ball.getRadius(), 2)) {
 			return true;
 		}
 		return false;
@@ -116,6 +116,62 @@ public:
 	//충돌 시 수행
 	void hitBy(CSphere& ball) 
 	{ 
+		if (hasIntersected(ball)) {
+			D3DXVECTOR3 targetpos = ball.getCenter();
+			D3DXVECTOR3	whitepos = this->getCenter();
+			double power = sqrt(pow(ball.getVelocity_X(), 2) + pow(ball.getVelocity_Z(), 2)) / 2;
+			double targetTheta = acos(sqrt(pow(targetpos.x - whitepos.x, 2)) / sqrt(pow(targetpos.x - whitepos.x, 2) + pow(targetpos.z - whitepos.z, 2))); // 1 사분면으로 갈 때
+			double distance = sqrt(pow(targetpos.x - whitepos.x, 2) + pow(targetpos.z - whitepos.z, 2));
+			double whiteTheta;
+			if (targetpos.x >= whitepos.x && targetpos.z >= whitepos.z) {
+				if (targetTheta < PI / 4) { //아래쪽
+					whiteTheta = targetTheta + PI / 2;
+					//exit(0);
+				}
+				else { //위쪽
+					whiteTheta = targetTheta - PI / 2;
+					//exit(0);
+				}
+			}
+			//3 사분면으로 갈 때
+			if (targetpos.x <= whitepos.x && targetpos.z <= whitepos.z) {
+				targetTheta = PI + targetTheta;
+				if (targetTheta < 5 * PI / 4) { //위쪽
+					whiteTheta = targetTheta + PI / 2;
+					//exit(0);
+				}
+				else { //아래쪽
+					whiteTheta = targetTheta - PI / 2;
+					
+				}
+			}
+			//2 사분면으로 갈 때
+			else if (targetpos.x <= whitepos.x && targetpos.z >= whitepos.z) {
+				targetTheta = PI - targetTheta;
+				if (targetTheta > 3 * PI / 4) { // 아래쪽
+					whiteTheta = targetTheta - PI/2;
+					//exit(0);
+				}
+				else {
+					whiteTheta = targetTheta + PI/2;
+					//exit(0);
+				}
+			}
+			//4 사분면으로 갈 때
+			else if (targetpos.x >= whitepos.x && targetpos.z <= whitepos.z) {
+				targetTheta = -targetTheta;
+				if (targetTheta > -PI / 4) { //위쪽
+					whiteTheta = targetTheta - PI / 2;
+					//exit(0);
+				}
+				else {
+					whiteTheta = targetTheta + PI / 2;
+					//exit(0);
+				}
+			}
+			this->setPower(-power * cos(targetTheta), -power * sin(targetTheta));
+			ball.setPower(-power * cos(whiteTheta), -power * sin(whiteTheta));
+		}
 		// Insert your code here.
 	}
 
@@ -259,7 +315,7 @@ public:
 	{
 		D3DXVECTOR3	ballPos = ball.getCenter();
 		
-		if ((ball.getRadius() + ballPos.x) == (this->m_width / 2) || (ballPos.x - ball.getRadius()) == (-(this->m_width / 2)) || (ball.getRadius() + ballPos.z) == (this->m_depth / 2) || (ballPos.z - ball.getRadius()) == (-(this->m_depth / 2))) {
+		if (ballPos.x >= 4.28 || ballPos.x <= -4.28 || ballPos.z >= 2.78 || ballPos.z <= -2.78) {
 			return true;
 		}
 		return false;
@@ -267,15 +323,28 @@ public:
 	//충돌 시 작업
 	void hitBy(CSphere& ball) 
 	{
+		int flag = 0;
 		// Insert your code here.
 		if (hasIntersected(ball)) {
-			if ((ball.getCenter().x - ball.getRadius()) == (-(this->m_width / 2)) || (ball.getCenter().x + ball.getRadius()) == (this->m_width / 2)) {
+			if ((ball.getCenter().x >= 4.28)) {
 				ball.setPower(-ball.getVelocity_X(), ball.getVelocity_Z());
+				ball.setCenter(4.27, ball.getCenter().y, ball.getCenter().z);
 			}
-			else if ((ball.getCenter().z + ball.getRadius()) == (this->m_depth / 2) || (ball.getCenter().z - ball.getRadius()) == (-(this->m_depth / 2))) {
+			else if (ball.getCenter().x <= -4.28) {
+				ball.setPower(-ball.getVelocity_X(), ball.getVelocity_Z());
+				ball.setCenter(-4.27, ball.getCenter().y, ball.getCenter().z);
+			}
+
+			else if (ball.getCenter().z >= 2.78) {
 				ball.setPower(ball.getVelocity_X(), -ball.getVelocity_Z());
+				ball.setCenter(ball.getCenter().x, ball.getCenter().y, 2.77);
+			}
+			else if (ball.getCenter().z <= -2.78) {
+				ball.setPower(ball.getVelocity_X(), -ball.getVelocity_Z());
+				ball.setCenter(ball.getCenter().x, ball.getCenter().y, -2.77);
 			}
 		}
+		flag = 0;
 	}    
 	
 	void setPosition(float x, float y, float z)
