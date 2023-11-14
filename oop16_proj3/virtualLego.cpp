@@ -17,12 +17,18 @@
 #include <cstdio>
 #include <cassert>
 #include <cmath>
+#include <d3dx9core.h>
 
 IDirect3DDevice9* Device = NULL;
+ID3DXFont* g_pFont = NULL;
 
 // window size
 const int Width  = 1024;
 const int Height = 768;
+
+int turn = 0;
+int flag1 = 0;
+int flag2 = 0;
 
 // There are four balls
 // initialize the position (coordinate) of each ball (ball0 ~ ball3)
@@ -41,6 +47,50 @@ D3DXMATRIX g_mProj;
 #define PI 3.14159265
 #define M_HEIGHT 0.01
 #define DECREASE_RATE 0.9982
+
+int num1 = 0;
+int num2 = 0;
+
+void InitFont(IDirect3DDevice9* pDevice) {
+	D3DXFONT_DESC fontDesc;
+	ZeroMemory(&fontDesc, sizeof(D3DXFONT_DESC));
+	fontDesc.Height = 24;  // 글자 크기
+	fontDesc.Width = 0;
+	fontDesc.Weight = 0;
+	fontDesc.MipLevels = 1;
+	fontDesc.Italic = false;
+	fontDesc.CharSet = DEFAULT_CHARSET;
+	fontDesc.OutputPrecision = OUT_DEFAULT_PRECIS;
+	fontDesc.Quality = DEFAULT_QUALITY;
+	fontDesc.PitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+	strcpy_s(fontDesc.FaceName, LF_FACESIZE, "Arial");
+
+	D3DXCreateFontIndirect(pDevice, &fontDesc, &g_pFont);
+}
+
+// Function to draw text on the screen
+void DrawText(IDirect3DDevice9* pDevice, const char* text, int x, int y) {
+	RECT rect;
+	SetRect(&rect, x, y, 0, 0);
+	g_pFont->DrawText(NULL, text, -1, &rect, DT_NOCLIP, D3DCOLOR_XRGB(255, 255, 255));
+
+
+	// 문자열 생성
+	char buffer[64];
+	sprintf_s(buffer, sizeof(buffer), "Player1: %d, Player2: %d", num1, num2);
+
+	// num 표시될 좌표
+	int numX = x;
+	int numY = y + 30;
+
+	// num을 출력
+	SetRect(&rect, numX, numY, 0, 0);
+	g_pFont->DrawText(NULL, buffer, -1, &rect, DT_NOCLIP, D3DCOLOR_XRGB(255, 255, 255));
+}
+
+void RenderText() {
+	DrawText(Device, "Score", 10, 10);
+}
 
 // -----------------------------------------------------------------------------
 // CSphere class definition
@@ -102,44 +152,42 @@ public:
         pDevice->SetMaterial(&m_mtrl);
 		m_pSphereMesh->DrawSubset(0);
     }
-	
+
 	// 두 구 사이에 충돌이 있는지 확인
     bool hasIntersected(CSphere& ball) 
 	{
 		//(중심 점 사이의 거리)^2 == (공들의 반지름 합)^2
-		if ((pow((this->center_x - ball.center_x), 2) + pow((this->center_z) - (ball.center_z), 2)) <= pow(this->getRadius() + ball.getRadius(), 2)) {
+		if (sqrt(pow((this->center_x - ball.center_x), 2) + pow((this->center_z) - (ball.center_z), 2)) <= this->getRadius() + ball.getRadius()) {
 			return true;
 		}
 		return false;
 	}
-
 	//충돌 시 수행
 	void hitBy(CSphere& ball) 
 	{ 
 		if (this->hasIntersected(ball)) {
-			D3DXVECTOR3 ball_cord = ball.getCenter();
+			D3DXVECTOR3 ballPos = ball.getCenter(); //부딪히는 공의 위치
+			double dx = this->center_x - ballPos.x;
+			double dz = this->center_z - ballPos.z;
+			double distance = sqrt(pow(dx, 2) + pow(dz, 2)); //사이 거리
 
-			double d_x = center_x - ball_cord.x;
-			double d_z = center_z - ball_cord.z;
-			double size_d = sqrt((d_x * d_x) + (d_z * d_z));
+			double whiteVx = this->m_velocity_x; 
+			double whiteVz = this->m_velocity_z; 
+			double targetVx = ball.m_velocity_x; 
+			double targetVz = ball.m_velocity_z; 
 
-			double vax = this->m_velocity_x;
-			double vaz = this->m_velocity_z;
-			double vbx = ball.m_velocity_x;
-			double vbz = ball.m_velocity_z;
+			double whiteV = sqrt(pow(whiteVx, 2) + pow(whiteVz,2));  //하얀 공 속도
 
-			double size_this_v = sqrt((vax * vax) + (vaz * vaz));
+			double cosTheta = dx / distance; //코사인
+			double sinTheta = dz / distance; //사인
 
-			double cos_t = d_x / size_d;
-			double sin_t = d_z / size_d;
+			double whiteVx2 = targetVx * cosTheta + targetVz * sinTheta;
+			double targetVx2 = whiteVx * cosTheta + whiteVz * sinTheta;
+			double whiteVz2 = whiteVz * cosTheta - whiteVx * sinTheta;
+			double targetVz2 = targetVz * cosTheta - targetVx * sinTheta;
 
-			double vaxp = vbx * cos_t + vbz * sin_t;
-			double vbxp = vax * cos_t + vaz * sin_t;
-			double vazp = vaz * cos_t - vax * sin_t;
-			double vbzp = vbz * cos_t - vbx * sin_t;
-
-			this->setPower(vaxp * cos_t - vazp * sin_t, vaxp * sin_t + vazp * cos_t);
-			ball.setPower(vbxp * cos_t - vbzp * sin_t, vbxp * sin_t + vbzp * cos_t);
+			this->setPower(whiteVx2 * cosTheta - whiteVz2 * sinTheta, whiteVx2 * sinTheta + whiteVz2 * cosTheta);
+			ball.setPower(targetVx2 * cosTheta - targetVz2 * sinTheta, targetVx2 * sinTheta + targetVz2 * cosTheta);
 		}
 		// Insert your code here.
 	}
@@ -512,6 +560,9 @@ bool Setup()
     Device->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
 	
 	g_light.setLight(Device, g_mWorld);
+
+	InitFont(Device);
+	RenderText();
 	return true;
 }
 
@@ -523,6 +574,11 @@ void Cleanup(void)
 	}
     destroyAllLegoBlock();
     g_light.destroy();
+	if (g_pFont != NULL) {
+		g_pFont->Release();
+		g_pFont = NULL;
+	}
+
 }
 
 
@@ -552,7 +608,44 @@ bool Display(float timeDelta)
 				g_sphere[i].hitBy(g_sphere[j]);
 			}
 		}
-
+		if (turn == 0 && g_sphere[3].hasIntersected(g_sphere[0])) {
+			flag1++;
+		}
+		else if (turn == 0 && g_sphere[3].hasIntersected(g_sphere[1])) {
+			flag2++;
+		}
+		if (turn == 1 && g_sphere[2].hasIntersected(g_sphere[0])) {
+			flag1++;
+		}
+		else if (turn == 1 && g_sphere[2].hasIntersected(g_sphere[1])) {
+			flag2++;
+		}
+		if (turn == 0 && g_sphere[0].getVelocity_X() == 0 && g_sphere[0].getVelocity_Z() == 0 && g_sphere[1].getVelocity_X() == 0 && g_sphere[1].getVelocity_Z() == 0 && g_sphere[2].getVelocity_X() == 0 && g_sphere[2].getVelocity_Z() == 0 && g_sphere[3].getVelocity_X() == 0 && g_sphere[3].getVelocity_Z() == 0) {
+			if (flag1 >= 1 && flag2 >= 1) {
+				num1++;
+				flag1 = 0;
+				flag2 = 0;
+			}
+			else if ((flag1 >= 1 && flag2 == 0) || (flag1 == 0 && flag2 >= 1)) {
+				flag1 = 0;
+				flag2 = 0;
+				turn = 1 - turn;
+			}
+			//아무것도 못 맞혔을 때 구현
+		}
+		if (turn == 1 && g_sphere[0].getVelocity_X() == 0 && g_sphere[0].getVelocity_Z() == 0 && g_sphere[1].getVelocity_X() == 0 && g_sphere[1].getVelocity_Z() == 0 && g_sphere[2].getVelocity_X() == 0 && g_sphere[2].getVelocity_Z() == 0 && g_sphere[3].getVelocity_X() == 0 && g_sphere[3].getVelocity_Z() == 0) {
+			if (flag1 >= 1 && flag2 >= 1) {
+				num2++;
+				flag1 = 0;
+				flag2 = 0;
+			}
+			else if ((flag1 >= 1 && flag2 == 0) || (flag1 == 0 && flag2 >= 1)) {
+				flag1 = 0;
+				flag2 = 0;
+				turn = 1 - turn;
+			}
+			//아무것도 못 맞혔을 때 구현
+		}
 		// draw plane, walls, and spheres
 		g_legoPlane.draw(Device, g_mWorld);
 		for (i=0;i<4;i++) 	{
@@ -561,7 +654,8 @@ bool Display(float timeDelta)
 		}
 		g_target_blueball.draw(Device, g_mWorld);
         g_light.draw(Device);
-		
+		RenderText();
+
 		Device->EndScene();
 		Device->Present(0, 0, 0, 0);
 		Device->SetTexture( 0, NULL );
@@ -600,14 +694,25 @@ LRESULT CALLBACK d3d::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				
 				D3DXVECTOR3 targetpos = g_target_blueball.getCenter();
 				D3DXVECTOR3	whitepos = g_sphere[3].getCenter();
-				double theta = acos(sqrt(pow(targetpos.x - whitepos.x, 2)) / sqrt(pow(targetpos.x - whitepos.x, 2) +
-					pow(targetpos.z - whitepos.z, 2)));		// 기본 1 사분면
-				if (targetpos.z - whitepos.z <= 0 && targetpos.x - whitepos.x >= 0) { theta = -theta; }	//4 사분면
-				if (targetpos.z - whitepos.z >= 0 && targetpos.x - whitepos.x <= 0) { theta = PI - theta; } //2 사분면
-				if (targetpos.z - whitepos.z <= 0 && targetpos.x - whitepos.x <= 0){ theta = PI + theta; } // 3 사분면
-				double distance = sqrt(pow(targetpos.x - whitepos.x, 2) + pow(targetpos.z - whitepos.z, 2));
-				g_sphere[3].setPower(distance * cos(theta), distance * sin(theta));
-
+				D3DXVECTOR3 yellowpos = g_sphere[2].getCenter();
+				if (turn == 0) {
+					double theta = acos(sqrt(pow(targetpos.x - whitepos.x, 2)) / sqrt(pow(targetpos.x - whitepos.x, 2) +
+						pow(targetpos.z - whitepos.z, 2)));		// 기본 1 사분면
+					if (targetpos.z - whitepos.z <= 0 && targetpos.x - whitepos.x >= 0) { theta = -theta; }	//4 사분면
+					if (targetpos.z - whitepos.z >= 0 && targetpos.x - whitepos.x <= 0) { theta = PI - theta; } //2 사분면
+					if (targetpos.z - whitepos.z <= 0 && targetpos.x - whitepos.x <= 0) { theta = PI + theta; } // 3 사분면
+					double distance = sqrt(pow(targetpos.x - whitepos.x, 2) + pow(targetpos.z - whitepos.z, 2));
+					g_sphere[3].setPower(distance * cos(theta), distance * sin(theta));
+				}
+				else {
+					double theta = acos(sqrt(pow(targetpos.x - yellowpos.x, 2)) / sqrt(pow(targetpos.x - yellowpos.x, 2) +
+						pow(targetpos.z - yellowpos.z, 2)));		// 기본 1 사분면
+					if (targetpos.z - yellowpos.z <= 0 && targetpos.x - yellowpos.x >= 0) { theta = -theta; }	//4 사분면
+					if (targetpos.z - yellowpos.z >= 0 && targetpos.x - yellowpos.x <= 0) { theta = PI - theta; } //2 사분면
+					if (targetpos.z - yellowpos.z <= 0 && targetpos.x - yellowpos.x <= 0) { theta = PI + theta; } // 3 사분면
+					double distance = sqrt(pow(targetpos.x - yellowpos.x, 2) + pow(targetpos.z - yellowpos.z, 2));
+					g_sphere[2].setPower(distance * cos(theta), distance * sin(theta));
+				}
 				break;
 
 			}

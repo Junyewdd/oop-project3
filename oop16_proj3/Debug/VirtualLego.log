@@ -2,18 +2,18 @@
   virtualLego.cpp
 C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\d3dUtility.h(23,1): warning C4005: 'INFINITY': 매크로 재정의
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt\corecrt_math.h(88): message : 'INFINITY'의 이전 정의를 참조하십시오.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(149,1): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(162,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(164,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(166,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(168,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(185,24): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(186,24): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(300,1): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(304,1): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(309,1): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(313,1): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(329,33): warning C4305: 'return': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(654,18): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(655,18): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(197,1): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(210,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(212,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(214,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(216,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(233,24): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(234,24): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(348,1): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(352,1): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(357,1): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(361,1): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(377,33): warning C4305: 'return': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(746,18): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\virtualLego.cpp(747,18): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   VirtualLego.vcxproj -> C:\Users\e\Desktop\2학년 2학기\객지프\oop-project3\oop16_proj3\Debug\VirtualLego.exe
